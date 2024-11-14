@@ -7,13 +7,13 @@ import {
   QueryClientProvider,
 } from "@tanstack/react-query";
 
-import {jsPDF} from "jspdf";
+import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 
 const queryClient = new QueryClient();
 
 function App() {
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
 
   // Fetch function for products
   const getProducts = async () => {
@@ -33,18 +33,17 @@ function App() {
     queryFn: getProducts,
   });
 
-  const handlePrint=() =>{
-   console.log("printed pdf")
+  const handlePrint = () => {
+    console.log("printed pdf");
 
-   const tableInfoPrint = new jsPDF({orientation: "landscape"});
+    const tableInfoPrint = new jsPDF({ orientation: "landscape" });
 
     tableInfoPrint.autoTable({
-      html:"#my-table",
+      html: "#my-table",
     });
 
     tableInfoPrint.save("data.pdf");
   };
-
 
   // Loading and error states
   if (isLoading) return <div>Loading...</div>;
@@ -54,7 +53,9 @@ function App() {
     <div>
       <h1 className="font-bold text-2xl text-center">PDF Print</h1>
       <div className="flex justify-end pb-5">
-        <button onClick={handlePrint} className="btn btn-secondary">Print PDF</button>
+        <button onClick={handlePrint} className="btn btn-secondary">
+          Print PDF
+        </button>
       </div>
       <div className="overflow-x-auto">
         <table className="table text-center" id="my-table">
