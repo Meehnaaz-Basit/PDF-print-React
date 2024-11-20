@@ -1,20 +1,10 @@
-import React from "react";
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-  QueryClient,
-  QueryClientProvider,
-} from "@tanstack/react-query";
+import { useQuery, QueryClient } from "@tanstack/react-query";
 
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
-
-const queryClient = new QueryClient();
+import domtoimage from "dom-to-image";
 
 function App() {
-  // const queryClient = useQueryClient();
-
   // Fetch function for products
   const getProducts = async () => {
     const res = await fetch("https://dummyjson.com/products");
@@ -33,18 +23,27 @@ function App() {
     queryFn: getProducts,
   });
 
+  // const handlePrint = () => {
+  //   console.log("printed pdf");
+
+  //   const tableInfoPrint = new jsPDF({ orientation: "landscape" });
+
+  //   tableInfoPrint.autoTable({
+  //     html: "#my-table",
+  //   });
+
+  //   tableInfoPrint.save("data.pdf");
+  // };
+
   const handlePrint = () => {
-    console.log("printed pdf");
+    const element = document.getElementById("my-table");
 
-    const tableInfoPrint = new jsPDF({ orientation: "landscape" });
-
-    tableInfoPrint.autoTable({
-      html: "#my-table",
+    domtoimage.toPng(element).then((dataUrl) => {
+      const pdf = new jsPDF({ orientation: "landscape" });
+      pdf.addImage(dataUrl, "PNG", 10, 10, 280, 0); // Adjust positioning as needed
+      pdf.save("data.pdf");
     });
-
-    tableInfoPrint.save("data.pdf");
   };
-
   // Loading and error states
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error fetching products</div>;
@@ -57,7 +56,7 @@ function App() {
           Print PDF
         </button>
       </div>
-      <div className="overflow-x-auto">
+      <div className="">
         <table className="table text-center" id="my-table">
           <thead className="bg-blue-300 text-black ">
             <tr>
@@ -76,9 +75,12 @@ function App() {
                 <td>{product.id}</td>
                 <td>
                   <img
-                    src={product.images}
+                    src={product?.images[0] || "https://placehold.co/60x60"}
                     className="w-20 m-auto object-cover"
-                    alt=""
+                    alt={product.title || "No Image"}
+                    onError={(e) =>
+                      (e.target.src = "https://placehold.co/60x60")
+                    }
                   />
                 </td>
                 <td>{product.title}</td>
@@ -91,19 +93,6 @@ function App() {
           </tbody>
         </table>
       </div>
-
-      {/* <button
-        onClick={() => {
-          mutation.mutate({
-            id: Date.now(),
-            title: "New Product",
-            price: 20.0,
-            category: "General",
-          });
-        }}
-      >
-        Add Product
-      </button> */}
     </div>
   );
 }
